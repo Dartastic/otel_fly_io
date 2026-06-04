@@ -2,7 +2,6 @@
 // Copyright 2025-2026 Mindful Software LLC d/b/a Dartastic.io, All rights reserved.
 
 import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
-import 'package:dartastic_opentelemetry_api/dartastic_opentelemetry_api.dart';
 
 import 'otel_fly_io_suppression.dart';
 
@@ -72,71 +71,98 @@ Future<T> tracedFlyIo<T>({
   final t = tracer ?? OTel.tracerProvider().getTracer('otel_fly_io');
   final span = t.startSpan('fly_io $operation', kind: SpanKind.client);
   try {
-    span.setStringAttribute('rpc.system', 'fly_io');
-    span.setStringAttribute('rpc.method', operation);
+    span.addAttributes(
+        OTel.attributes([OTel.attributeString('rpc.system', 'fly_io')]));
+    span.addAttributes(
+        OTel.attributes([OTel.attributeString('rpc.method', operation)]));
     final r = await invoke();
     final res = r.result;
     if (res != null) {
       if (res.organization != null) {
-        span.setStringAttribute('fly.organization', res.organization!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeString('fly.organization', res.organization!)]));
       }
       if (res.appName != null) {
-        span.setStringAttribute('fly.app.name', res.appName!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeString('fly.app.name', res.appName!)]));
       }
       if (res.appStatus != null) {
-        span.setStringAttribute('fly.app.status', res.appStatus!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeString('fly.app.status', res.appStatus!)]));
       }
       if (res.machineId != null) {
-        span.setStringAttribute('fly.machine.id', res.machineId!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeString('fly.machine.id', res.machineId!)]));
       }
       if (res.machineState != null) {
-        span.setStringAttribute('fly.machine.state', res.machineState!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeString('fly.machine.state', res.machineState!)]));
       }
       if (res.machineCpuKind != null) {
-        span.setStringAttribute('fly.machine.cpu_kind', res.machineCpuKind!);
+        span.addAttributes(OTel.attributes([
+          OTel.attributeString('fly.machine.cpu_kind', res.machineCpuKind!)
+        ]));
       }
       if (res.machineCpus != null) {
-        span.setIntAttribute('fly.machine.cpus', res.machineCpus!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeInt('fly.machine.cpus', res.machineCpus!)]));
       }
       if (res.machineMemoryMb != null) {
-        span.setIntAttribute('fly.machine.memory_mb', res.machineMemoryMb!);
+        span.addAttributes(OTel.attributes([
+          OTel.attributeInt('fly.machine.memory_mb', res.machineMemoryMb!)
+        ]));
       }
       if (res.machineImage != null) {
-        span.setStringAttribute('fly.machine.image', res.machineImage!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeString('fly.machine.image', res.machineImage!)]));
       }
       if (res.region != null) {
-        span.setStringAttribute('fly.region', res.region!);
+        span.addAttributes(
+            OTel.attributes([OTel.attributeString('fly.region', res.region!)]));
       }
       if (res.releaseId != null) {
-        span.setStringAttribute('fly.release.id', res.releaseId!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeString('fly.release.id', res.releaseId!)]));
       }
       if (res.releaseVersion != null) {
-        span.setIntAttribute('fly.release.version', res.releaseVersion!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeInt('fly.release.version', res.releaseVersion!)]));
       }
       if (res.releaseStrategy != null) {
-        span.setStringAttribute('fly.release.strategy', res.releaseStrategy!);
+        span.addAttributes(OTel.attributes([
+          OTel.attributeString('fly.release.strategy', res.releaseStrategy!)
+        ]));
       }
       if (res.volumeId != null) {
-        span.setStringAttribute('fly.volume.id', res.volumeId!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeString('fly.volume.id', res.volumeId!)]));
       }
       if (res.volumeSizeGb != null) {
-        span.setIntAttribute('fly.volume.size_gb', res.volumeSizeGb!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeInt('fly.volume.size_gb', res.volumeSizeGb!)]));
       }
       if (res.postgresClusterId != null) {
-        span.setStringAttribute(
-            'fly.postgres.cluster_id', res.postgresClusterId!);
+        span.addAttributes(OTel.attributes([
+          OTel.attributeString(
+              'fly.postgres.cluster_id', res.postgresClusterId!)
+        ]));
       }
       if (res.postgresStatus != null) {
-        span.setStringAttribute('fly.postgres.status', res.postgresStatus!);
+        span.addAttributes(OTel.attributes([
+          OTel.attributeString('fly.postgres.status', res.postgresStatus!)
+        ]));
       }
       if (res.litefsRegion != null) {
-        span.setStringAttribute('fly.litefs.region', res.litefsRegion!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeString('fly.litefs.region', res.litefsRegion!)]));
       }
       if (res.statusCode != null) {
-        span.setIntAttribute('http.response.status_code', res.statusCode!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeInt('http.response.status_code', res.statusCode!)]));
       }
       if (res.errorCode != null) {
-        span.setStringAttribute('fly.error.code', res.errorCode!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeString('fly.error.code', res.errorCode!)]));
       }
       final fail = res.errorCode != null ||
           (res.statusCode != null && res.statusCode! >= 400) ||
@@ -145,8 +171,10 @@ Future<T> tracedFlyIo<T>({
           res.appStatus == 'suspended' ||
           res.appStatus == 'deleted';
       if (fail) {
-        span.setStringAttribute(
-            ErrorResource.errorType.key, res.errorCode ?? 'fly_io.error');
+        span.addAttributes(OTel.attributes([
+          OTel.attributeString(
+              ErrorResource.errorType.key, res.errorCode ?? 'fly_io.error')
+        ]));
         span.setStatus(SpanStatusCode.Error, res.errorMessage);
       }
     }
